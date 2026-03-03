@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Arena</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icon.png">
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- Mod Seçimi -->
+        <div id="mode-screen" class="screen active">
+            <h1>Mind Arena</h1>
+            <p>Bilgini test et!</p>
+            <div class="input-section">
+                <input type="text" id="nickname-input" placeholder="Takma Adın (Nickname)" maxlength="15">
+            </div>
+            <div class="mode-selection">
+                <h3>Oyun Modu Seç</h3>
+                <button id="single-player-btn" class="mode-btn">
+                    <span class="mode-icon">🎮</span>
+                    <span class="mode-title">Tek Oyuncu</span>
+                    <span class="mode-desc">Yapay zekaya karşı oyna</span>
+                </button>
+                <button id="multi-player-btn" class="mode-btn">
+                    <span class="mode-icon">👥</span>
+                    <span class="mode-title">Çok Oyuncu</span>
+                    <span class="mode-desc">Arkadaşlarınla oyna</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tek Oyuncu Kategori -->
+        <div id="category-screen" class="screen hidden">
+            <h1>KATEGORİ SEÇ</h1>
+            <button class="back-btn" onclick="backToMode()">← Geri</button>
+            <div class="category-section">
+                <h3>Kategori Seç</h3>
+                <div id="category-grid" class="category-grid"></div>
+            </div>
+        </div>
+
+        <!-- Çok Oyuncu Menü -->
+        <div id="multiplayer-menu" class="screen hidden">
+            <h1>ÇOK OYUNCU</h1>
+            <button class="back-btn" onclick="backToMode()">← Geri</button>
+            <div class="multiplayer-options">
+                <button id="create-room-btn" class="mp-option-btn">
+                    <span class="mp-icon">🏠</span>
+                    <span class="mp-title">Oda Oluştur</span>
+                    <span class="mp-desc">Yeni bir oyun oluştur</span>
+                </button>
+                <button id="join-room-btn" class="mp-option-btn">
+                    <span class="mp-icon">🚪</span>
+                    <span class="mp-title">Odaya Katıl</span>
+                    <span class="mp-desc">Oda koduyla katıl</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Oda Oluştur -->
+        <div id="create-room-screen" class="screen hidden">
+            <h1>ODA OLUŞTUR</h1>
+            <button class="back-btn" onclick="backToMultiplayerMenu()">← Geri</button>
+            <div class="category-section">
+                <h3>Kategori Seç</h3>
+                <div id="mp-category-grid" class="category-grid"></div>
+            </div>
+            <div class="category-section">
+                <h3>Soru Sayısı</h3>
+                <select id="question-count-select" class="question-count-select">
+                    <option value="10">10 Soru</option>
+                    <option value="20" selected>20 Soru</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Odaya Katıl -->
+        <div id="join-room-screen" class="screen hidden">
+            <h1>ODAYA KATIL</h1>
+            <button class="back-btn" onclick="backToMultiplayerMenu()">← Geri</button>
+            <div class="input-section">
+                <input type="text" id="room-code-input" placeholder="Oda Kodunu Girin (6 hane)" maxlength="6" style="text-transform: uppercase;">
+                <button id="join-room-submit-btn" class="btn primary">Katıl</button>
+            </div>
+            <div class="room-list-section">
+                <div class="room-list-header">
+                    <h3>🔎 LAN'daki Açık Odalar</h3>
+                    <button id="refresh-rooms-btn" class="refresh-btn" title="Yenile">🔄</button>
+                </div>
+                <div id="room-list" class="room-list">
+                    <div class="room-list-empty">
+                        <span>🔍</span>
+                        <p>Odalar aranıyor...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bekleme Odası -->
+        <div id="lobby-screen" class="screen hidden">
+            <h1>BEKLEME ODASI</h1>
+            <div class="room-code-display">
+                <span class="room-code-label">Oda Kodu:</span>
+                <span id="lobby-room-code" class="room-code">------</span>
+                <button id="copy-code-btn" class="copy-btn" title="Kodu Kopyala">📋</button>
+            </div>
+            <div class="lobby-info">
+                <p id="lobby-category" class="lobby-category">Kategori: <strong>-</strong></p>
+                <p class="lobby-question-count">Soru sayısı: <strong id="lobby-question-count">20</strong></p>
+            </div>
+            <div class="player-list-container">
+                <h3>Oyuncular (<span id="player-count">0</span>)</h3>
+                <div id="player-list" class="player-list"></div>
+            </div>
+            <div class="lobby-actions">
+                <button id="start-game-btn" class="btn primary" style="display: none;">Oyunu Başlat</button>
+                <button id="leave-room-btn" class="btn secondary">Odadan Ayrıl</button>
+            </div>
+        </div>
+
+        <!-- Yükleniyor -->
+        <div id="loading-screen" class="screen hidden">
+            <div class="spinner"></div>
+            <h2 id="loading-text">Sorular Hazırlanıyor...</h2>
+        </div>
+
+        <!-- Oyun Ekranı -->
+        <div id="game-screen" class="screen hidden">
+            <div class="header">
+                <div class="score-board">Puan: <span id="score">0</span></div>
+                <div class="timer">Süre: <span id="timer">10</span></div>
+            </div>
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div class="question-container">
+                <h2 id="question-text">Soru Yükleniyor...</h2>
+                <span id="question-category" class="badge">Kategori</span>
+            </div>
+            <div id="options-grid" class="options-grid"></div>
+            <div class="footer">
+                <span id="question-counter">Soru 1 / 20</span>
+                <button id="exit-game-btn" class="exit-game-btn">🚪 Çık</button>
+            </div>
+        </div>
+
+        <!-- Soru Kaynağı Göstergesi -->
+        <div id="question-source" class="question-source-badge hidden">API</div>
+
+        <!-- Sonuç Ekranı -->
+        <div id="result-screen" class="screen hidden">
+            <h2 id="result-title">Oyun Bitti!</h2>
+            <div id="single-player-results">
+                <div class="final-score">Toplam Puan: <span id="final-score">0</span></div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="label">Doğru</span>
+                        <span id="total-correct" class="value correct">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">Yanlış</span>
+                        <span id="total-wrong" class="value wrong">0</span>
+                    </div>
+                </div>
+            </div>
+            <div id="multiplayer-results" style="display: none;">
+                <div class="winner-announcement">
+                    <span class="trophy">🏆</span>
+                    <h3 id="winner-name">-</h3>
+                    <p>Kazanan!</p>
+                </div>
+                <div class="leaderboard">
+                    <h3>Skor Tablosu</h3>
+                    <div id="leaderboard-list" class="leaderboard-list"></div>
+                </div>
+            </div>
+            <button id="restart-btn" class="btn primary">Tekrar Oyna</button>
+        </div>
+
+        <!-- Multiplayer IP Bilgisi -->
+        <div id="mp-ip-info" class="mp-ip-info hidden">
+            📡 Arkadaşların bağlanacağı adres:<br>
+            <strong id="mp-server-address">Bağlanıyor...</strong>
+            <button id="copy-ip-btn" class="copy-ip-btn" title="Adresi Kopyala">📋</button>
+            <button id="edit-ip-btn" class="edit-ip-btn" title="IP Adresini Düzenle">✏️</button>
+            <input type="text" id="ip-edit-input" class="ip-edit-input hidden" placeholder="IP:Port (Örn: 192.168.1.100:3000)">
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
