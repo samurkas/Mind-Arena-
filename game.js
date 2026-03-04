@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
     const screens = {
         mode: document.getElementById('mode-screen'),
@@ -214,7 +214,8 @@
         if (typeof io === 'undefined') { alert('Socket.io y\u00fcklenemedi!'); return false; }
         try {
             let url = window.location.origin;
-            if (window.location.port !== '3000') url = 'http://127.0.0.1:3000';
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            if (isLocal && window.location.port !== '3000') url = 'http://127.0.0.1:3000';
             state.socket = io(url, { reconnectionAttempts: 3, timeout: 5000 });
         } catch (err) { alert('Ba\u011flant\u0131 hatas\u0131: ' + err.message); return false; }
 
@@ -489,7 +490,8 @@
             state.socket.emit('getRooms');
         } else {
             let url = window.location.origin + '/rooms';
-            if (window.location.port !== '3000') url = 'http://127.0.0.1:3000/rooms';
+            const isLocal2 = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            if (isLocal2 && window.location.port !== '3000') url = 'http://127.0.0.1:3000/rooms';
             fetch(url).then(r => r.json()).then(data => renderRoomList(data.rooms || []))
                 .catch(() => { el.roomList.innerHTML = '<div class="room-list-empty"><span>\u26a0\ufe0f</span><p>Sunucuya ba\u011flan\u0131lamad\u0131</p></div>'; });
         }
@@ -522,7 +524,8 @@
     // ==================== AI SORU URETIMI ====================
     async function fetchQuestions(category, questionCount) {
         let serverUrl = '';
-        if (window.location.port !== '3000') serverUrl = 'http://127.0.0.1:3000';
+        const isLocal3 = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (isLocal3 && window.location.port !== '3000') serverUrl = 'http://127.0.0.1:3000';
         const resp = await fetch(`${serverUrl}/api/questions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
